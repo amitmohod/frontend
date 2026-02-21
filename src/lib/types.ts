@@ -99,3 +99,60 @@ export interface AskAIMessage {
   role: "user" | "assistant";
   content: string;
 }
+
+// Fireflies Transcripts
+export interface TranscriptSentence {
+  text: string;
+  speaker_name: string;
+  speaker_email: string | null;
+  start_time: number;
+  end_time: number;
+}
+
+export interface TranscriptSummary {
+  overview: string;
+  action_items: string[];
+  keywords: string[];
+  topics_discussed: string[];
+}
+
+export interface MeetingAttendee {
+  display_name: string;
+  email: string;
+  phone_number: string | null;
+}
+
+export interface Transcript {
+  id: string;
+  title: string;
+  date: string;
+  duration: number;
+  host_email: string;
+  organizer_email: string;
+  participants: string[];
+  meeting_attendees: MeetingAttendee[];
+  summary: TranscriptSummary;
+  sentences: TranscriptSentence[];
+  audio_url: string | null;
+  video_url: string | null;
+  transcript_url: string;
+  deal_id: string | null;
+  contact_ids: string[];
+}
+
+export interface TranscriptListItem {
+  id: string;
+  title: string;
+  date: string;
+  duration: number;
+  participants: string[];
+  deal_id: string | null;
+  transcript_url: string;
+}
+
+export interface DealTranscriptsResponse {
+  deal_id: string;
+  deal_name: string;
+  transcript_count: number;
+  transcripts: Transcript[];
+}

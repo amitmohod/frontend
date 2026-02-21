@@ -45,5 +45,23 @@ export const askAI = (question: string) =>
     body: JSON.stringify({ question }),
   });
 
+// Transcripts
+export const getDealTranscripts = (dealId: string) =>
+  fetchAPI<import("./types").DealTranscriptsResponse>(`/transcripts/deal/${dealId}`);
+
+export const getTranscript = (transcriptId: string) =>
+  fetchAPI<import("./types").Transcript>(`/transcripts/${transcriptId}`);
+
+export const getTranscripts = (params?: { participant_email?: string; contact_id?: string; limit?: number }) => {
+  const searchParams = new URLSearchParams();
+  if (params?.participant_email) searchParams.set("participant_email", params.participant_email);
+  if (params?.contact_id) searchParams.set("contact_id", params.contact_id);
+  if (params?.limit) searchParams.set("limit", params.limit.toString());
+  const qs = searchParams.toString();
+  return fetchAPI<{ total: number; count: number; transcripts: import("./types").TranscriptListItem[] }>(
+    `/transcripts${qs ? `?${qs}` : ""}`
+  );
+};
+
 // SWR fetcher
 export const fetcher = (url: string) => fetchAPI(url);

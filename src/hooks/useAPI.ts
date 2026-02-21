@@ -7,6 +7,9 @@ import type {
   ICPProfile,
   Deal,
   AIInsightResponse,
+  DealTranscriptsResponse,
+  Transcript,
+  TranscriptListItem,
 } from "@/lib/types";
 
 const API = "http://localhost:8000/api";
@@ -60,5 +63,31 @@ export function useAIInsight(type: string, params?: Record<string, string>) {
     `${API}/insights/${type}${qs ? `?${qs}` : ""}`,
     fetcher,
     { revalidateOnFocus: false }
+  );
+}
+
+export function useDealTranscripts(dealId: string | null) {
+  return useSWR<DealTranscriptsResponse>(
+    dealId ? `${API}/transcripts/deal/${dealId}` : null,
+    fetcher
+  );
+}
+
+export function useTranscript(transcriptId: string | null) {
+  return useSWR<Transcript>(
+    transcriptId ? `${API}/transcripts/${transcriptId}` : null,
+    fetcher
+  );
+}
+
+export function useTranscripts(params?: { participant_email?: string; contact_id?: string; limit?: number }) {
+  const searchParams = new URLSearchParams();
+  if (params?.participant_email) searchParams.set("participant_email", params.participant_email);
+  if (params?.contact_id) searchParams.set("contact_id", params.contact_id);
+  if (params?.limit) searchParams.set("limit", params.limit.toString());
+  const qs = searchParams.toString();
+  return useSWR<{ total: number; count: number; transcripts: TranscriptListItem[] }>(
+    `${API}/transcripts${qs ? `?${qs}` : ""}`,
+    fetcher
   );
 }
