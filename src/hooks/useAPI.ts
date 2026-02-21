@@ -12,7 +12,7 @@ import type {
   TranscriptListItem,
 } from "@/lib/types";
 
-const API = "http://localhost:8000/api";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
