@@ -17,22 +17,24 @@ export default function MetricCard({
 }: MetricCardProps) {
   const trendColor =
     trend === "up"
-      ? "text-emerald-400"
+      ? "text-teal-600"
       : trend === "down"
-      ? "text-red-400"
-      : "text-slate-400";
+      ? "text-rose-500"
+      : "text-stone-400";
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 hover:border-slate-600/50 transition-colors">
+    <div className="bg-white border border-stone-200 rounded-2xl p-5 card-hover shadow-sm">
       <div className="flex items-start justify-between mb-3">
-        <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+        <span className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider">
           {title}
         </span>
-        {icon && <span className="text-slate-500">{icon}</span>}
+        {icon && <span className="text-stone-300">{icon}</span>}
       </div>
-      <div className="text-2xl font-bold text-white mb-1">{value}</div>
+      <div className="text-[28px] font-bold text-stone-900 leading-none mb-1.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+        {value}
+      </div>
       {subtitle && (
-        <span className={`text-xs ${trendColor}`}>{subtitle}</span>
+        <span className={`text-xs font-medium ${trendColor}`}>{subtitle}</span>
       )}
     </div>
   );
