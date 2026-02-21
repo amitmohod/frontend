@@ -7,6 +7,7 @@ import type {
   ICPProfile,
   Deal,
   AIInsightResponse,
+  StrategicSignals,
   DealTranscriptsResponse,
   Transcript,
   TranscriptListItem,
@@ -54,6 +55,10 @@ export function useDeals(params?: {
 
 export function useRecentDeals(limit = 10) {
   return useSWR<Deal[]>(`${API}/deals/recent?limit=${limit}`, fetcher);
+}
+
+export function useStrategicSignals() {
+  return useSWR<StrategicSignals>(`${API}/analytics/signals`, fetcher);
 }
 
 export function useAIInsight(type: string, params?: Record<string, string>) {

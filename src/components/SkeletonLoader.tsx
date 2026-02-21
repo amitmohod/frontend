@@ -29,6 +29,36 @@ export function SkeletonChart({ height = "h-64" }: { height?: string }) {
   );
 }
 
+export function SkeletonSignalCard() {
+  return (
+    <div className="bg-teal-50/40 border border-stone-200 rounded-2xl p-5 animate-pulse shadow-sm">
+      <div className="h-4 w-20 bg-stone-100 rounded-full mb-3" />
+      <div className="h-4 w-full bg-stone-100 rounded-lg mb-2" />
+      <div className="h-3 w-3/4 bg-stone-50 rounded-full mb-2" />
+      <div className="h-3 w-1/2 bg-stone-50 rounded-full" />
+    </div>
+  );
+}
+
+export function SkeletonThemeCard() {
+  return (
+    <div className="bg-white border border-stone-200 rounded-2xl p-5 animate-pulse shadow-sm">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-7 h-7 rounded-lg bg-stone-100" />
+        <div className="h-4 w-24 bg-stone-100 rounded-full" />
+      </div>
+      <div className="space-y-2 mb-3">
+        <div className="h-3 w-full bg-stone-50 rounded-full" />
+        <div className="h-3 w-3/4 bg-stone-50 rounded-full" />
+      </div>
+      <div className="bg-stone-50 rounded-lg p-3 mt-3">
+        <div className="h-3 w-full bg-stone-100 rounded-full mb-1" />
+        <div className="h-3 w-2/3 bg-stone-100 rounded-full" />
+      </div>
+    </div>
+  );
+}
+
 export function SkeletonTable({ rows = 5 }: { rows?: number }) {
   return (
     <div className="bg-white border border-stone-200 rounded-2xl p-5 animate-pulse shadow-sm">

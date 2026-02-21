@@ -100,6 +100,71 @@ export interface AskAIMessage {
   content: string;
 }
 
+// Strategic Signals types
+
+export interface SegmentStat {
+  name: string;
+  win_rate: number;
+  total: number;
+}
+
+export interface EnhancedKPIs {
+  win_rate: number;
+  won_deals: number;
+  lost_deals: number;
+  best_segment: SegmentStat;
+  worst_segment: SegmentStat;
+  total_revenue: number;
+  total_lost_revenue: number;
+  top_leak_reason: string;
+  top_leak_amount: number;
+  avg_deal_size: number;
+  sweet_spot_range: string;
+  sweet_spot_win_rate: number;
+  large_deal_range: string;
+  large_deal_win_rate: number;
+  avg_cycle_won: number;
+  avg_cycle_lost: number;
+  cycle_drag: number;
+}
+
+export interface GrowthLever {
+  source: string;
+  win_rate: number;
+  pipeline_pct: number;
+  total_deals: number;
+}
+
+export interface RevenueLeak {
+  competitor: string;
+  revenue_lost: number;
+  deals_lost: number;
+}
+
+export interface ICPFitSignal {
+  icp_match_pct: number;
+  icp_win_rate: number;
+  non_icp_win_rate: number;
+}
+
+export interface ConversationThemeAgg {
+  theme: string;
+  frequency: number;
+  deal_pct: number;
+  win_rate_when_raised: number;
+  impact_level: "High" | "Medium" | "Low";
+  sample_quote: string;
+  sample_source: string;
+}
+
+export interface StrategicSignals {
+  kpis: EnhancedKPIs;
+  growth_lever: GrowthLever;
+  revenue_leak: RevenueLeak;
+  icp_fit: ICPFitSignal;
+  conversation_themes: ConversationThemeAgg[];
+}
+
 // Fireflies Transcripts
 export interface TranscriptSentence {
   text: string;

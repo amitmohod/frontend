@@ -1,14 +1,21 @@
 "use client";
 
 import {
-  useOverview,
+  useStrategicSignals,
   useBreakdown,
   useRecentDeals,
   useAIInsight,
 } from "@/hooks/useAPI";
-import MetricCard from "@/components/MetricCard";
+import InsightMetricCard from "@/components/InsightMetricCard";
+import StrategicSignalCard from "@/components/StrategicSignalCard";
+import ConversationSignals from "@/components/ConversationSignals";
 import AIInsightBox from "@/components/AIInsightBox";
-import { SkeletonCard, SkeletonChart } from "@/components/SkeletonLoader";
+import {
+  SkeletonCard,
+  SkeletonChart,
+  SkeletonSignalCard,
+  SkeletonThemeCard,
+} from "@/components/SkeletonLoader";
 import {
   BarChart,
   Bar,
@@ -33,7 +40,7 @@ const tooltipStyle = {
 };
 
 export default function OverviewPage() {
-  const { data: metrics, isLoading: metricsLoading } = useOverview();
+  const { data: signals, isLoading: signalsLoading } = useStrategicSignals();
   const { data: industryData } = useBreakdown("industry");
   const { data: recentDeals } = useRecentDeals(8);
   const { data: aiSummary, isLoading: aiLoading, error: aiError } = useAIInsight("win-loss-summary");
@@ -53,6 +60,8 @@ export default function OverviewPage() {
         .slice(0, 6)
     : [];
 
+  const kpis = signals?.kpis;
+
   return (
     <div className="space-y-8">
       <div>
@@ -64,44 +73,105 @@ export default function OverviewPage() {
         </p>
       </div>
 
-      {/* KPI Cards */}
+      {/* Enhanced KPI Cards */}
       <div className="grid grid-cols-4 gap-5">
-        {metricsLoading ? (
+        {signalsLoading ? (
           <>
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
           </>
-        ) : metrics ? (
+        ) : kpis ? (
           <>
-            <MetricCard
+            <InsightMetricCard
               title="Win Rate"
-              value={`${metrics.win_rate}%`}
-              subtitle={`${metrics.won_deals}W / ${metrics.lost_deals}L`}
-              trend={metrics.win_rate > 45 ? "up" : "down"}
+              value={`${kpis.win_rate}%`}
+              health={kpis.win_rate >= 50 ? "green" : kpis.win_rate >= 35 ? "amber" : "red"}
+              subMetric={`${kpis.won_deals}W / ${kpis.lost_deals}L`}
+              insight={`Best: ${kpis.best_segment.name} (${kpis.best_segment.win_rate}%) | Worst: ${kpis.worst_segment.name} (${kpis.worst_segment.win_rate}%)`}
             />
-            <MetricCard
+            <InsightMetricCard
               title="Total Revenue"
-              value={`$${(metrics.total_revenue / 1e6).toFixed(1)}M`}
-              subtitle={`${metrics.won_deals} closed-won deals`}
-              trend="up"
+              value={`$${(kpis.total_revenue / 1e6).toFixed(1)}M`}
+              health={kpis.total_lost_revenue > kpis.total_revenue ? "red" : "amber"}
+              subMetric={`$${(kpis.total_lost_revenue / 1e6).toFixed(1)}M lost`}
+              insight={`Top leak: ${kpis.top_leak_reason} ($${(kpis.top_leak_amount / 1e6).toFixed(1)}M)`}
             />
-            <MetricCard
+            <InsightMetricCard
               title="Avg Deal Size"
-              value={`$${(metrics.avg_deal_size / 1000).toFixed(0)}K`}
-              subtitle="Won deals"
-              trend="neutral"
+              value={`$${(kpis.avg_deal_size / 1000).toFixed(0)}K`}
+              health={kpis.sweet_spot_win_rate >= 55 ? "green" : "amber"}
+              subMetric={`Sweet spot: ${kpis.sweet_spot_range}`}
+              insight={`${kpis.sweet_spot_range} wins at ${kpis.sweet_spot_win_rate}% | ${kpis.large_deal_range} wins at only ${kpis.large_deal_win_rate}%`}
             />
-            <MetricCard
+            <InsightMetricCard
               title="Avg Cycle"
-              value={`${metrics.avg_cycle_won}d`}
-              subtitle={`Won: ${metrics.avg_cycle_won}d | Lost: ${metrics.avg_cycle_lost}d`}
-              trend="up"
+              value={`${kpis.avg_cycle_won}d`}
+              health={kpis.cycle_drag > 25 ? "red" : kpis.cycle_drag > 15 ? "amber" : "green"}
+              subMetric={`Won: ${kpis.avg_cycle_won}d | Lost: ${kpis.avg_cycle_lost}d`}
+              insight={`Lost deals drag ${kpis.cycle_drag}d longer — early kill = freed capacity`}
             />
           </>
         ) : null}
       </div>
+
+      {/* Strategic Signals */}
+      <div>
+        <h2 className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          Strategic Signals
+        </h2>
+        <div className="grid grid-cols-3 gap-5">
+          {signalsLoading ? (
+            <>
+              <SkeletonSignalCard />
+              <SkeletonSignalCard />
+              <SkeletonSignalCard />
+            </>
+          ) : signals ? (
+            <>
+              <StrategicSignalCard
+                title="Growth Lever"
+                color="teal"
+                headline={`${signals.growth_lever.source} converts at ${signals.growth_lever.win_rate}% but is only ${signals.growth_lever.pipeline_pct}% of pipeline`}
+                metric={`${signals.growth_lever.win_rate}% win rate`}
+                detail={`${signals.growth_lever.total_deals} deals from this source. Doubling investment here could significantly lift overall win rate.`}
+              />
+              <StrategicSignalCard
+                title="Revenue Leak"
+                color="rose"
+                headline={`Lost $${(signals.revenue_leak.revenue_lost / 1e6).toFixed(1)}M to ${signals.revenue_leak.competitor} across ${signals.revenue_leak.deals_lost} deals`}
+                metric={`$${(signals.revenue_leak.revenue_lost / 1e6).toFixed(1)}M lost`}
+                detail={`${signals.revenue_leak.competitor} is the top competitive threat by revenue impact. Review battlecard and win-back strategy.`}
+              />
+              <StrategicSignalCard
+                title="ICP Fit"
+                color="blue"
+                headline={`Only ${signals.icp_fit.icp_match_pct}% of pipeline matches ICP`}
+                metric={`${signals.icp_fit.icp_win_rate}% vs ${signals.icp_fit.non_icp_win_rate}%`}
+                detail={`ICP deals win at ${signals.icp_fit.icp_win_rate}% vs ${signals.icp_fit.non_icp_win_rate}% for non-ICP. Tightening qualification could lift win rate by ${(signals.icp_fit.icp_win_rate - signals.icp_fit.non_icp_win_rate).toFixed(0)}pp.`}
+              />
+            </>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Conversation Signals */}
+      {signalsLoading ? (
+        <div>
+          <div className="h-4 w-40 bg-stone-100 rounded-full mb-4 animate-pulse" />
+          <div className="grid grid-cols-3 gap-4">
+            <SkeletonThemeCard />
+            <SkeletonThemeCard />
+            <SkeletonThemeCard />
+            <SkeletonThemeCard />
+            <SkeletonThemeCard />
+            <SkeletonThemeCard />
+          </div>
+        </div>
+      ) : signals?.conversation_themes ? (
+        <ConversationSignals themes={signals.conversation_themes} />
+      ) : null}
 
       {/* Charts Row */}
       <div className="grid grid-cols-2 gap-5">
