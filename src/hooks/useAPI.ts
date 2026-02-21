@@ -8,7 +8,6 @@ import type {
   Deal,
   AIInsightResponse,
   StrategicSignals,
-  StrategicSignals,
   DealTranscriptsResponse,
   Transcript,
   TranscriptListItem,
