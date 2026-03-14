@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useDataSource } from "@/contexts/DataSourceContext";
 
 const navItems = [
   {
@@ -73,6 +74,7 @@ const navItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const [loadingPath, setLoadingPath] = useState<string | null>(null);
+  const { dataSource, isSwitching, switchToMock, openHubSpotModal } = useDataSource();
 
   // Clear loading state when pathname changes (navigation complete)
   useEffect(() => {
@@ -138,11 +140,43 @@ export default function Sidebar() {
           );
         })}
       </nav>
-      <div className="px-6 py-4 border-t border-stone-100">
-        <div className="flex items-center gap-2 text-[11px] text-stone-400">
-          <div className="w-1.5 h-1.5 rounded-full bg-teal-500 shadow-sm shadow-teal-200" />
-          175 deals loaded
-        </div>
+      <div className="px-4 py-4 border-t border-stone-100 space-y-2">
+        <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-1">
+          Data Source
+        </p>
+
+        {dataSource === "mock" ? (
+          <button
+            onClick={openHubSpotModal}
+            disabled={isSwitching}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-lg border border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-100 transition-all text-[12px] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+              Mock Data
+            </div>
+            <span className="text-[10px] text-stone-400">Connect →</span>
+          </button>
+        ) : (
+          <button
+            onClick={switchToMock}
+            disabled={isSwitching}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-lg border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-all text-[12px] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="flex items-center gap-2">
+              {isSwitching ? (
+                <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              ) : (
+                <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+              )}
+              HubSpot Live
+            </div>
+            <span className="text-[10px] text-orange-400">Disconnect</span>
+          </button>
+        )}
       </div>
     </aside>
   );
