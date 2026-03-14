@@ -54,8 +54,8 @@ const DataSourceContext = createContext<DataSourceContextValue>({
   switchToMock: async () => {},
   openHubSpotModal: () => {},
   closeHubSpotModal: () => {},
-  fetchPreview: async () => {},
-  activateHubSpot: async () => {},
+  fetchPreview: async (_token: string) => null,
+  activateHubSpot: async (_token: string, _deals: PreviewDeal[]) => {},
   clearPreview: () => {},
   clearSavedToken: () => {},
 });
