@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import PageLoadingOverlay from "@/components/PageLoadingOverlay";
+import Providers from "@/components/Providers";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,13 +31,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-stone-50 text-stone-900`}
       >
-        <PageLoadingOverlay />
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main className="flex-1 overflow-auto">
-            <div className="max-w-7xl mx-auto px-8 py-8">{children}</div>
-          </main>
-        </div>
+        <Providers>
+          <PageLoadingOverlay />
+          <div className="flex min-h-screen">
+            <Sidebar />
+            <main className="flex-1 overflow-auto">
+              <div className="max-w-7xl mx-auto px-8 py-8">{children}</div>
+            </main>
+          </div>
+        </Providers>
       </body>
     </html>
   );
