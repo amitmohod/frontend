@@ -8,19 +8,20 @@ export default function PageLoadingOverlay() {
   const [displayLoading, setDisplayLoading] = useState(false);
 
   useEffect(() => {
-    // Small delay to avoid flash for instant navigations
+    // Show overlay after brief delay (avoids flash for instant navigations)
     const showTimer = setTimeout(() => {
       setDisplayLoading(true);
-    }, 100);
+    }, 50);
 
-    // Clear loading when pathname changes (navigation complete)
+    // Hide overlay after navigation is considered complete
     const hideTimer = setTimeout(() => {
       setDisplayLoading(false);
-    }, 50);
+    }, 300);
 
     return () => {
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
+      setDisplayLoading(false);
     };
   }, [pathname]);
 
