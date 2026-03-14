@@ -2,220 +2,17 @@
 
 import { useState } from "react";
 import { useProductLine, PRODUCT_LINE_LABELS } from "@/contexts/ProductLineContext";
+import {
+  useFeatureGaps,
+  useIntegrationGaps,
+  usePersonaNeeds,
+  useCompetitors,
+  useAIInsight,
+} from "@/hooks/useAPI";
+import type { FeatureGap, IntegrationGap, PersonaNeed, CompetitorMetrics } from "@/lib/types";
 
 // ─── Local display type (maps global context values to display labels) ────────
 const PRODUCT_LINES = Object.values(PRODUCT_LINE_LABELS) as string[];
-
-const TA_FEATURE_GAPS = [
-  {
-    id: 1,
-    name: "IDE / Code Replay quality",
-    deals: 12,
-    revenue: 480000,
-    competitors: ["HackerRank"],
-    quote: '"Their coding environment felt more like a real IDE. Ours felt like a text box."',
-    quoteContext: "Lost deal · IT Services · $52K",
-  },
-  {
-    id: 2,
-    name: "Coding question library depth",
-    deals: 9,
-    revenue: 360000,
-    competitors: ["HackerRank", "Codility"],
-    quote: '"HackerRank had 3x more questions across niche languages we needed."',
-    quoteContext: "Lost deal · Product/SaaS · $44K",
-  },
-  {
-    id: 3,
-    name: "ATS integration gaps",
-    deals: 8,
-    revenue: 320000,
-    competitors: ["Multiple"],
-    quote: '"We needed a native Greenhouse integration — not a Zapier workaround."',
-    quoteContext: "Lost deal · BFSI · $38K",
-  },
-  {
-    id: 4,
-    name: "AI proctoring accuracy",
-    deals: 6,
-    revenue: 240000,
-    competitors: ["HireVue"],
-    quote: '"HireVue\'s false-positive rate was lower. Candidates were complaining about ours."',
-    quoteContext: "Lost deal · Healthcare · $41K",
-  },
-  {
-    id: 5,
-    name: "Candidate-facing UX",
-    deals: 5,
-    revenue: 200000,
-    competitors: ["TestGorilla"],
-    quote: '"TestGorilla looked polished and modern. Our candidates noticed the difference."',
-    quoteContext: "Lost deal · IT Services · $31K",
-  },
-];
-
-const SI_FEATURE_GAPS = [
-  {
-    id: 1,
-    name: "Skills ontology depth & accuracy",
-    deals: 14,
-    revenue: 620000,
-    competitors: ["Eightfold AI"],
-    quote: '"Eightfold\'s skills graph was significantly richer. They had 5 years of training data on us."',
-    quoteContext: "Lost deal · BFSI · $68K",
-  },
-  {
-    id: 2,
-    name: "Workday / SAP HCM integration",
-    deals: 11,
-    revenue: 520000,
-    competitors: ["Eightfold AI", "Gloat"],
-    quote: '"We needed certified Workday integration. Not an API — a certified connector."',
-    quoteContext: "Lost deal · Healthcare · $55K",
-  },
-  {
-    id: 3,
-    name: "Internal mobility workflow automation",
-    deals: 8,
-    revenue: 380000,
-    competitors: ["Gloat"],
-    quote: '"Gloat had built-in job posting to internal talent pool. We had to build that manually."',
-    quoteContext: "Lost deal · Manufacturing · $49K",
-  },
-  {
-    id: 4,
-    name: "Board-level workforce analytics",
-    deals: 6,
-    revenue: 290000,
-    competitors: ["Eightfold AI"],
-    quote: '"The CHRO needed a slide she could show the board. Eightfold had a template for that."',
-    quoteContext: "Lost deal · BFSI · $47K",
-  },
-  {
-    id: 5,
-    name: "AI skills inference accuracy",
-    deals: 5,
-    revenue: 240000,
-    competitors: ["Eightfold AI", "SkyHive"],
-    quote: '"Their AI inferred skills from resumes that were 3 years old with surprising accuracy."',
-    quoteContext: "Lost deal · IT Services · $38K",
-  },
-];
-
-const TA_INTEGRATIONS = [
-  { name: "Greenhouse ATS", deals: 6, revenue: 240000, severity: "high" },
-  { name: "Workday Recruiting", deals: 4, revenue: 160000, severity: "high" },
-  { name: "iCIMS", deals: 3, revenue: 120000, severity: "medium" },
-  { name: "Lever", deals: 2, revenue: 80000, severity: "medium" },
-];
-
-const SI_INTEGRATIONS = [
-  { name: "Workday HCM", deals: 11, revenue: 520000, severity: "high" },
-  { name: "SAP SuccessFactors", deals: 7, revenue: 330000, severity: "high" },
-  { name: "Oracle HCM", deals: 4, revenue: 190000, severity: "medium" },
-  { name: "Cornerstone LMS", deals: 3, revenue: 140000, severity: "medium" },
-];
-
-const TA_PERSONAS = [
-  {
-    title: "VP TA / Head Recruitment",
-    winRate: 62,
-    health: "green" as const,
-    asks: ["ATS integration", "Assessment library breadth", "Candidate experience quality"],
-    concern: "Needs proof of validity + bias-free assessments for EEOC compliance.",
-  },
-  {
-    title: "TA Manager",
-    winRate: 28,
-    health: "red" as const,
-    asks: ["Pricing flexibility", "Easy setup (no IT)", "Reporting & export"],
-    concern: "Budget-constrained. Needs to justify purchase to VP without procurement.",
-  },
-];
-
-const SI_PERSONAS = [
-  {
-    title: "CHRO / CPO",
-    winRate: 60,
-    health: "green" as const,
-    asks: ["Board-level reporting", "ROI quantification", "HCM integration"],
-    concern: "Must justify skills investment to board. Needs data to show workforce readiness.",
-  },
-  {
-    title: "Head of L&D",
-    winRate: 35,
-    health: "amber" as const,
-    asks: ["LMS integration", "Skill gap visualisation", "Upskilling ROI tracking"],
-    concern: "Owns learning budget but lacks authority to sign enterprise deals alone.",
-  },
-];
-
-const TA_COMPETITORS = [
-  {
-    name: "HackerRank",
-    threat: "HIGH",
-    winRate: 25,
-    capabilities: [
-      { label: "Code replay", count: 12 },
-      { label: "Question library", count: 9 },
-      { label: "IDE realism", count: 7 },
-      { label: "Enterprise pricing", count: 5 },
-    ],
-  },
-  {
-    name: "HireVue",
-    threat: "MED",
-    winRate: 38,
-    capabilities: [
-      { label: "Video AI scoring", count: 8 },
-      { label: "Enterprise ATS", count: 6 },
-      { label: "Brand recognition", count: 4 },
-    ],
-  },
-  {
-    name: "Codility",
-    threat: "MED",
-    winRate: 42,
-    capabilities: [
-      { label: "Question library", count: 7 },
-      { label: "Competitive pricing", count: 6 },
-      { label: "API quality", count: 4 },
-    ],
-  },
-];
-
-const SI_COMPETITORS = [
-  {
-    name: "Eightfold AI",
-    threat: "HIGH",
-    winRate: 28,
-    capabilities: [
-      { label: "Skills ontology depth", count: 14 },
-      { label: "AI inference accuracy", count: 11 },
-      { label: "Talent intelligence", count: 8 },
-      { label: "Market data breadth", count: 6 },
-    ],
-  },
-  {
-    name: "Gloat",
-    threat: "MED",
-    winRate: 35,
-    capabilities: [
-      { label: "Internal mobility UX", count: 9 },
-      { label: "Job marketplace", count: 7 },
-      { label: "HCM integrations", count: 5 },
-    ],
-  },
-  {
-    name: "Lightcast",
-    threat: "LOW",
-    winRate: 55,
-    capabilities: [
-      { label: "Labour market data", count: 6 },
-      { label: "Skills taxonomy", count: 4 },
-    ],
-  },
-];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -223,20 +20,47 @@ function fmtK(n: number) {
   return `$${Math.round(n / 1000)}K`;
 }
 
-function threatStyle(t: string) {
-  if (t === "HIGH") return "bg-rose-50 text-rose-600 ring-1 ring-rose-200";
-  if (t === "MED") return "bg-amber-50 text-amber-700 ring-1 ring-amber-200";
+function threatStyle(winRate: number) {
+  if (winRate < 35) return "bg-rose-50 text-rose-600 ring-1 ring-rose-200";
+  if (winRate < 50) return "bg-amber-50 text-amber-700 ring-1 ring-amber-200";
   return "bg-teal-50 text-teal-700 ring-1 ring-teal-200";
+}
+
+function threatLabel(winRate: number) {
+  if (winRate < 35) return "HIGH";
+  if (winRate < 50) return "MED";
+  return "LOW";
 }
 
 function severityDot(s: string) {
   return s === "high" ? "bg-rose-500" : "bg-amber-400";
 }
 
-function healthStyle(h: "green" | "amber" | "red") {
-  if (h === "green") return "bg-teal-50 text-teal-700 ring-1 ring-teal-200";
-  if (h === "amber") return "bg-amber-50 text-amber-700 ring-1 ring-amber-200";
+function winRateHealth(wr: number): string {
+  if (wr >= 50) return "bg-teal-50 text-teal-700 ring-1 ring-teal-200";
+  if (wr >= 35) return "bg-amber-50 text-amber-700 ring-1 ring-amber-200";
   return "bg-rose-50 text-rose-600 ring-1 ring-rose-200";
+}
+
+function formatSimpleMarkdown(text: string): string {
+  return text
+    .replace(/^### (.*$)/gm, '<h3 class="text-base font-bold text-stone-800 mt-3 mb-1">$1</h3>')
+    .replace(/^## (.*$)/gm, '<h2 class="text-lg font-bold text-stone-800 mt-3 mb-1">$1</h2>')
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/`(.*?)`/g, '<code class="bg-teal-50 px-1.5 py-0.5 rounded-md text-teal-700 text-xs font-medium">$1</code>')
+    .replace(/^- (.*$)/gm, '<li class="ml-4">$1</li>')
+    .replace(/^(\d+)\. (.*$)/gm, '<li class="ml-4">$2</li>')
+    .replace(/\n\n/g, "<br/><br/>")
+    .replace(/\n/g, "<br/>");
+}
+
+// ─── Loading Skeleton ─────────────────────────────────────────────────────────
+
+function SkeletonBlock({ h = "h-32" }: { h?: string }) {
+  return (
+    <div className={`bg-white border border-stone-200 rounded-2xl shadow-sm ${h} animate-pulse`} />
+  );
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -244,13 +68,25 @@ function healthStyle(h: "green" | "amber" | "red") {
 function FeatureGapRadar({
   gaps,
   productLine,
+  isLoading,
 }: {
-  gaps: typeof TA_FEATURE_GAPS;
+  gaps?: FeatureGap[];
   productLine: string;
+  isLoading: boolean;
 }) {
-  const [expanded, setExpanded] = useState<number | null>(null);
-  const max = gaps[0].revenue;
-  const total = gaps.reduce((s, g) => s + g.revenue, 0);
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  if (isLoading) return <SkeletonBlock h="h-64" />;
+  if (!gaps || gaps.length === 0) {
+    return (
+      <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-8 text-center">
+        <p className="text-sm text-stone-400">No feature gaps found for this product line.</p>
+      </div>
+    );
+  }
+
+  const max = gaps[0].revenue_at_risk;
+  const total = gaps.reduce((s, g) => s + g.revenue_at_risk, 0);
 
   return (
     <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
@@ -273,13 +109,13 @@ function FeatureGapRadar({
 
       <div className="divide-y divide-stone-100">
         {gaps.map((gap) => {
-          const isOpen = expanded === gap.id;
-          const barPct = (gap.revenue / max) * 100;
+          const isOpen = expanded === gap.name;
+          const barPct = max > 0 ? (gap.revenue_at_risk / max) * 100 : 0;
           return (
-            <div key={gap.id}>
+            <div key={gap.name}>
               <button
                 className="w-full text-left px-6 py-4 hover:bg-stone-50/60 transition-colors"
-                onClick={() => setExpanded(isOpen ? null : gap.id)}
+                onClick={() => setExpanded(isOpen ? null : gap.name)}
               >
                 <div className="flex flex-wrap items-center gap-3 mb-2.5">
                   <span className="text-sm font-semibold text-stone-800 flex-1 min-w-0">
@@ -287,12 +123,12 @@ function FeatureGapRadar({
                   </span>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-600">
-                      {gap.deals} deals
+                      {gap.deals_affected} deals
                     </span>
                     <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-600 ring-1 ring-rose-200">
-                      {fmtK(gap.revenue)}
+                      {fmtK(gap.revenue_at_risk)}
                     </span>
-                    {gap.competitors.map((c) => (
+                    {gap.competitors.slice(0, 2).map((c) => (
                       <span
                         key={c}
                         className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-stone-100 text-stone-500 hidden sm:inline-flex"
@@ -328,10 +164,10 @@ function FeatureGapRadar({
                 <div className="px-6 pb-4 -mt-1">
                   <div className="bg-stone-50 border border-stone-200 rounded-xl px-4 py-3">
                     <p className="text-sm text-stone-600 italic leading-relaxed">
-                      {gap.quote}
+                      &ldquo;{gap.sample_quote}&rdquo;
                     </p>
                     <p className="text-[11px] text-stone-400 mt-1.5 font-medium">
-                      {gap.quoteContext}
+                      {gap.sample_quote_context}
                     </p>
                   </div>
                 </div>
@@ -346,10 +182,21 @@ function FeatureGapRadar({
 
 function IntegrationGapTracker({
   integrations,
+  isLoading,
 }: {
-  integrations: typeof TA_INTEGRATIONS;
+  integrations?: IntegrationGap[];
+  isLoading: boolean;
 }) {
-  const total = integrations.reduce((s, i) => s + i.revenue, 0);
+  if (isLoading) return <SkeletonBlock h="h-56" />;
+  if (!integrations || integrations.length === 0) {
+    return (
+      <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-8 text-center">
+        <p className="text-sm text-stone-400">No integration gaps found.</p>
+      </div>
+    );
+  }
+
+  const total = integrations.reduce((s, i) => s + i.revenue_at_risk, 0);
   return (
     <div className="bg-white border border-stone-200 rounded-2xl shadow-sm flex flex-col">
       <div className="px-6 py-4 border-b border-stone-100">
@@ -377,10 +224,10 @@ function IntegrationGapTracker({
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-[10px] font-semibold text-stone-400">
-                {item.deals} deals
+                {item.deals_affected} deals
               </span>
               <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-600 ring-1 ring-rose-200">
-                {fmtK(item.revenue)}
+                {fmtK(item.revenue_at_risk)}
               </span>
             </div>
           </div>
@@ -397,13 +244,22 @@ function IntegrationGapTracker({
   );
 }
 
-type Persona = { title: string; winRate: number; health: "green" | "amber" | "red"; asks: string[]; concern: string };
-
 function BuyerPersonaMap({
   personas,
+  isLoading,
 }: {
-  personas: Persona[];
+  personas?: PersonaNeed[];
+  isLoading: boolean;
 }) {
+  if (isLoading) return <SkeletonBlock h="h-56" />;
+  if (!personas || personas.length === 0) {
+    return (
+      <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-8 text-center">
+        <p className="text-sm text-stone-400">No persona data found.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white border border-stone-200 rounded-2xl shadow-sm flex flex-col">
       <div className="px-6 py-4 border-b border-stone-100">
@@ -426,13 +282,13 @@ function BuyerPersonaMap({
                 {p.title}
               </span>
               <span
-                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0 ${healthStyle(p.health)}`}
+                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0 ${winRateHealth(p.win_rate)}`}
               >
-                {p.winRate}% win
+                {p.win_rate}% win
               </span>
             </div>
             <div className="flex flex-wrap gap-1.5 mb-2.5">
-              {p.asks.map((ask) => (
+              {p.top_asks.map((ask) => (
                 <span
                   key={ask}
                   className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 border border-teal-100"
@@ -454,10 +310,21 @@ function BuyerPersonaMap({
 function CompetitorCapabilityMap({
   competitors,
   productLine,
+  isLoading,
 }: {
-  competitors: typeof TA_COMPETITORS;
+  competitors?: CompetitorMetrics[];
   productLine: string;
+  isLoading: boolean;
 }) {
+  if (isLoading) return <SkeletonBlock h="h-48" />;
+  if (!competitors || competitors.length === 0) {
+    return (
+      <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-8 text-center">
+        <p className="text-sm text-stone-400">No competitor data found.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-stone-100 flex items-center justify-between gap-3">
@@ -478,32 +345,32 @@ function CompetitorCapabilityMap({
       </div>
       <div className="divide-y divide-stone-100">
         {competitors.map((comp) => (
-          <div key={comp.name} className="px-6 py-4">
+          <div key={comp.competitor} className="px-6 py-4">
             <div className="flex flex-wrap items-center gap-2.5 mb-3">
               <span
                 className="text-sm font-bold text-stone-900"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                {comp.name}
+                {comp.competitor}
               </span>
               <span
-                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${threatStyle(comp.threat)}`}
+                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${threatStyle(comp.win_rate)}`}
               >
-                {comp.threat} THREAT
+                {threatLabel(comp.win_rate)} THREAT
               </span>
               <span className="text-[11px] font-semibold text-stone-400">
-                {comp.winRate}% our win rate
+                {comp.win_rate}% our win rate
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {comp.capabilities.map((cap) => (
+              {comp.top_loss_reasons.map((reason, idx) => (
                 <span
-                  key={cap.label}
+                  key={`${reason}-${idx}`}
                   className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-stone-50 border border-stone-200 text-stone-600"
                 >
-                  {cap.label}
+                  {reason}
                   <span className="text-[10px] font-bold text-stone-400">
-                    ×{cap.count}
+                    ×{comp.losses > 0 ? Math.max(1, Math.round(comp.losses / Math.max(comp.top_loss_reasons.length, 1))) : 1}
                   </span>
                 </span>
               ))}
@@ -515,31 +382,15 @@ function CompetitorCapabilityMap({
   );
 }
 
-function AIProductBrief({ productLine }: { productLine: string }) {
-  const isTA = productLine === "TA" || productLine === "All";
-
-  const brief = isTA
-    ? {
-        period: "TA · Q4 2024",
-        points: [
-          { rank: 1, text: "IDE & code replay quality", revenue: "$480K blocked pipeline", context: "12 deals vs HackerRank" },
-          { rank: 2, text: "ATS integration completeness", revenue: "$400K across 14 deals", context: "Greenhouse, Workday, iCIMS" },
-          { rank: 3, text: "Assessment library expansion", revenue: "$360K", context: "vs HackerRank / Codility" },
-        ],
-        emerging: "AI proctoring accuracy concerns increased in Q4. HireVue is actively repositioning on integrity guarantees. Recommend a proactive product response before Q1 pipeline opens.",
-        opportunity: "HackerRank dominates IT Services but shows weakness in BFSI (only 2 competitive encounters). TA product has an untapped vertical advantage in BFSI — worth a targeted go-to-market push.",
-      }
-    : {
-        period: "SI · Q4 2024",
-        points: [
-          { rank: 1, text: "Skills ontology depth & accuracy", revenue: "$620K blocked pipeline", context: "14 deals vs Eightfold AI" },
-          { rank: 2, text: "Workday / SAP HCM integration", revenue: "$520K across 18 deals", context: "Certified connector required" },
-          { rank: 3, text: "Internal mobility workflow automation", revenue: "$380K", context: "vs Gloat" },
-        ],
-        emerging: "CHRO buyers are increasingly asking for board-ready reporting slides. Eightfold is winning on narrative as much as product. Consider a CPO-level reporting template as a quick win.",
-        opportunity: "Eightfold AI is strong in large enterprises (5000+ employees) but weak in BFSI mid-market (1000–5000 employees). SI has an opening to dominate this segment with targeted case studies.",
-      };
-
+function AIProductBrief({
+  content,
+  isLoading,
+  productLine,
+}: {
+  content?: string;
+  isLoading: boolean;
+  productLine: string;
+}) {
   return (
     <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-stone-100 flex flex-wrap items-center justify-between gap-3">
@@ -551,65 +402,33 @@ function AIProductBrief({ productLine }: { productLine: string }) {
             AI Product Intelligence Brief
           </h3>
           <p className="text-xs text-stone-400 mt-0.5">
-            Generated for product planning · {brief.period}
+            Generated for product planning · {productLine}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-stone-100 text-stone-500">
-            {brief.period}
+            {productLine}
           </span>
-          <button className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-stone-200 text-stone-600 hover:bg-stone-50 transition-colors">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Export
-          </button>
         </div>
       </div>
 
-      <div className="px-6 py-5 space-y-5">
-        <div>
-          <p className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-3">
-            Top 3 roadmap investments by revenue impact
-          </p>
-          <div className="space-y-2.5">
-            {brief.points.map((p) => (
-              <div
-                key={p.rank}
-                className="flex items-start gap-3 p-3.5 rounded-xl bg-stone-50 border border-stone-100"
-              >
-                <span className="text-[11px] font-bold text-stone-400 mt-0.5 w-4 shrink-0">
-                  {p.rank}.
-                </span>
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm font-semibold text-stone-800">
-                    {p.text}
-                  </span>
-                  <span className="text-[11px] text-stone-400 ml-2">
-                    {p.context}
-                  </span>
-                </div>
-                <span className="text-[11px] font-bold text-teal-700 shrink-0">
-                  {p.revenue}
-                </span>
-              </div>
-            ))}
+      <div className="px-6 py-5">
+        {isLoading ? (
+          <div className="space-y-3 animate-pulse">
+            <div className="h-3 bg-stone-100 rounded-full w-3/4" />
+            <div className="h-3 bg-stone-100 rounded-full w-full" />
+            <div className="h-3 bg-stone-100 rounded-full w-2/3" />
+            <div className="h-3 bg-stone-100 rounded-full w-1/2 mt-4" />
+            <div className="h-3 bg-stone-100 rounded-full w-4/5" />
           </div>
-        </div>
-
-        <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200">
-          <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1.5">
-            Emerging Pattern
-          </p>
-          <p className="text-[12px] text-stone-700 leading-relaxed">{brief.emerging}</p>
-        </div>
-
-        <div className="p-4 rounded-xl bg-teal-50/60 border border-teal-200">
-          <p className="text-[10px] font-bold text-teal-600 uppercase tracking-wider mb-1.5">
-            Opportunity
-          </p>
-          <p className="text-[12px] text-stone-700 leading-relaxed">{brief.opportunity}</p>
-        </div>
+        ) : content ? (
+          <div
+            className="text-sm text-stone-700 leading-relaxed space-y-2"
+            dangerouslySetInnerHTML={{ __html: formatSimpleMarkdown(content) }}
+          />
+        ) : (
+          <p className="text-sm text-stone-400">No brief available.</p>
+        )}
       </div>
     </div>
   );
@@ -621,12 +440,18 @@ export default function ProductIntelligencePage() {
   const { productLine, setProductLine } = useProductLine();
 
   const activeLabel = PRODUCT_LINE_LABELS[productLine];
-  const isTA = productLine === "TA" || productLine === "all";
-  const featureGaps = isTA ? TA_FEATURE_GAPS : SI_FEATURE_GAPS;
-  const integrations = isTA ? TA_INTEGRATIONS : SI_INTEGRATIONS;
-  const personas = isTA ? TA_PERSONAS : SI_PERSONAS;
-  const competitors = isTA ? TA_COMPETITORS : SI_COMPETITORS;
-  const displayLine = productLine === "all" ? "TA" : activeLabel;
+  const displayLine = productLine === "all" ? "All Products" : activeLabel;
+
+  const { data: featureGaps, isLoading: gapsLoading } = useFeatureGaps(productLine);
+  const { data: integrationGaps, isLoading: intLoading } = useIntegrationGaps(productLine);
+  const { data: personaNeeds, isLoading: personaLoading } = usePersonaNeeds(productLine);
+  const { data: competitors, isLoading: compLoading } = useCompetitors(productLine);
+
+  const plForBrief = productLine !== "all" ? productLine : undefined;
+  const { data: productBrief, isLoading: briefLoading } = useAIInsight(
+    "product-brief",
+    plForBrief ? { product_line: plForBrief } : {}
+  );
 
   return (
     <div className="space-y-8">
@@ -682,22 +507,27 @@ export default function ProductIntelligencePage() {
       {productLine !== "full_platform" && (
         <>
           {/* Feature Gap Radar */}
-          <FeatureGapRadar gaps={featureGaps} productLine={displayLine} />
+          <FeatureGapRadar gaps={featureGaps} productLine={displayLine} isLoading={gapsLoading} />
 
           {/* Integration + Persona */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <IntegrationGapTracker integrations={integrations} />
-            <BuyerPersonaMap personas={personas} />
+            <IntegrationGapTracker integrations={integrationGaps} isLoading={intLoading} />
+            <BuyerPersonaMap personas={personaNeeds} isLoading={personaLoading} />
           </div>
 
           {/* Competitive Capability Map */}
           <CompetitorCapabilityMap
             competitors={competitors}
             productLine={displayLine}
+            isLoading={compLoading}
           />
 
           {/* AI Brief */}
-          <AIProductBrief productLine={activeLabel} />
+          <AIProductBrief
+            content={productBrief?.content}
+            isLoading={briefLoading}
+            productLine={displayLine}
+          />
         </>
       )}
     </div>

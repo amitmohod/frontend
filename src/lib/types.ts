@@ -240,3 +240,30 @@ export interface DealTranscriptsResponse {
   transcript_count: number;
   transcripts: Transcript[];
 }
+
+// Product Intelligence types
+
+export interface FeatureGap {
+  name: string;
+  deals_affected: number;
+  revenue_at_risk: number;
+  competitors: string[];
+  sample_quote: string;
+  sample_quote_context: string;
+  source: string;
+}
+
+export interface IntegrationGap {
+  name: string;
+  deals_affected: number;
+  revenue_at_risk: number;
+  severity: string;
+}
+
+export interface PersonaNeed {
+  title: string;
+  win_rate: number;
+  top_asks: string[];
+  deal_count: number;
+  concern: string;
+}

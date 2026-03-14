@@ -7,6 +7,7 @@ import {
   useAIInsight,
   useTrends,
 } from "@/hooks/useAPI";
+import { useProductLine } from "@/contexts/ProductLineContext";
 import InsightMetricCard from "@/components/InsightMetricCard";
 import StrategicSignalCard from "@/components/StrategicSignalCard";
 import ConversationSignals from "@/components/ConversationSignals";
@@ -156,7 +157,8 @@ function CEOActionDigest({ signals }: { signals: StrategicSignals }) {
 
 // ─── Win Rate Trend Chart ─────────────────────────────────────────────────────
 function WinRateTrendChart() {
-  const { data: trends } = useTrends();
+  const { productLine } = useProductLine();
+  const { data: trends } = useTrends(productLine);
 
   if (!trends || trends.length < 2) return null;
 
@@ -234,12 +236,13 @@ function WinRateTrendChart() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function OverviewPage() {
-  const { data: signals, isLoading: signalsLoading } = useStrategicSignals();
-  const { data: industryData } = useBreakdown("industry");
-  const { data: recentDeals } = useRecentDeals(8);
+  const { productLine } = useProductLine();
+  const { data: signals, isLoading: signalsLoading } = useStrategicSignals(productLine);
+  const { data: industryData } = useBreakdown("industry", { productLine });
+  const { data: recentDeals } = useRecentDeals(8, productLine);
   const { data: aiSummary, isLoading: aiLoading, error: aiError } = useAIInsight("win-loss-summary");
 
-  const { data: allDeals } = useRecentDeals(50);
+  const { data: allDeals } = useRecentDeals(50, productLine);
   const lossReasons = allDeals
     ? Object.entries(
         allDeals

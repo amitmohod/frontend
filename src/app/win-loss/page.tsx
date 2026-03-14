@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useBreakdown, useDeals, useAIInsight } from "@/hooks/useAPI";
+import { useProductLine } from "@/contexts/ProductLineContext";
 import AIInsightBox from "@/components/AIInsightBox";
 import {
   BarChart,
@@ -32,10 +33,11 @@ const DIMENSIONS = [
 ];
 
 export default function WinLossPage() {
+  const { productLine } = useProductLine();
   const [dimension, setDimension] = useState("industry");
   const [stageFilter, setStageFilter] = useState("");
-  const { data: breakdown } = useBreakdown(dimension);
-  const { data: deals } = useDeals(stageFilter ? { stage: stageFilter } : undefined);
+  const { data: breakdown } = useBreakdown(dimension, { productLine });
+  const { data: deals } = useDeals(stageFilter ? { stage: stageFilter, productLine } : { productLine });
   const { data: aiInsight, isLoading: aiLoading, error: aiError } = useAIInsight("win-loss-summary");
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useObjections, useAIInsight } from "@/hooks/useAPI";
+import { useProductLine } from "@/contexts/ProductLineContext";
 import AIInsightBox from "@/components/AIInsightBox";
 import {
   BarChart,
@@ -23,7 +24,8 @@ const tooltipStyle = {
 };
 
 export default function ObjectionsPage() {
-  const { data: objections } = useObjections();
+  const { productLine } = useProductLine();
+  const { data: objections } = useObjections(productLine);
   const { data: aiScripts, isLoading: scriptsLoading, error: scriptsError } = useAIInsight("sales-scripts");
 
   return (

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useCompetitors, useAIInsight } from "@/hooks/useAPI";
+import { useProductLine } from "@/contexts/ProductLineContext";
 import AIInsightBox from "@/components/AIInsightBox";
 
 function getHeatColor(value: number, metric: string): string {
@@ -25,7 +26,8 @@ function getThreatLevel(winRate: number): { label: string; color: string } {
 }
 
 export default function CompetitorsPage() {
-  const { data: competitors } = useCompetitors();
+  const { productLine } = useProductLine();
+  const { data: competitors } = useCompetitors(productLine);
   const [selectedCompetitor, setSelectedCompetitor] = useState<string | null>(null);
   const { data: aiBriefing, isLoading: aiLoading, error: aiError } = useAIInsight("competitors");
 

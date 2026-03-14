@@ -1,10 +1,12 @@
 "use client";
 
 import { useICP, useAIInsight } from "@/hooks/useAPI";
+import { useProductLine } from "@/contexts/ProductLineContext";
 import AIInsightBox from "@/components/AIInsightBox";
 
 export default function ICPPage() {
-  const { data: icp } = useICP();
+  const { productLine } = useProductLine();
+  const { data: icp } = useICP(productLine);
   const { data: aiICP, isLoading: aiICPLoading, error: aiICPError } = useAIInsight("icp");
   const { data: aiPositioning, isLoading: posLoading, error: posError } = useAIInsight("positioning");
 
