@@ -57,7 +57,7 @@ function EditableCell({
 export default function HubSpotTokenModal() {
   const {
     showTokenModal, closeHubSpotModal,
-    previewDeals, isFetchingPreview, previewError,
+    isFetchingPreview, previewError,
     fetchPreview, activateHubSpot, isSwitching, clearSavedToken,
   } = useDataSource();
 
@@ -113,7 +113,7 @@ export default function HubSpotTokenModal() {
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) { next.delete(id); } else { next.add(id); }
       return next;
     });
   };
