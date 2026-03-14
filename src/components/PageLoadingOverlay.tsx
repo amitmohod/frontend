@@ -5,13 +5,9 @@ import { usePathname } from "next/navigation";
 
 export default function PageLoadingOverlay() {
   const pathname = usePathname();
-  const [isLoading, setIsLoading] = useState(false);
   const [displayLoading, setDisplayLoading] = useState(false);
 
   useEffect(() => {
-    // Start loading
-    setIsLoading(true);
-
     // Small delay to avoid flash for instant navigations
     const showTimer = setTimeout(() => {
       setDisplayLoading(true);
@@ -19,7 +15,6 @@ export default function PageLoadingOverlay() {
 
     // Clear loading when pathname changes (navigation complete)
     const hideTimer = setTimeout(() => {
-      setIsLoading(false);
       setDisplayLoading(false);
     }, 50);
 
