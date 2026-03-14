@@ -74,7 +74,7 @@ export default function OverviewPage() {
       </div>
 
       {/* Enhanced KPI Cards */}
-      <div className="grid grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {signalsLoading ? (
           <>
             <SkeletonCard />
@@ -121,7 +121,7 @@ export default function OverviewPage() {
         <h2 className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
           Strategic Signals
         </h2>
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {signalsLoading ? (
             <>
               <SkeletonSignalCard />
@@ -160,7 +160,7 @@ export default function OverviewPage() {
       {signalsLoading ? (
         <div>
           <div className="h-4 w-40 bg-stone-100 rounded-full mb-4 animate-pulse" />
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <SkeletonThemeCard />
             <SkeletonThemeCard />
             <SkeletonThemeCard />
@@ -174,7 +174,7 @@ export default function OverviewPage() {
       ) : null}
 
       {/* Charts Row */}
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
           <h3 className="text-sm font-semibold text-stone-700 mb-5">
             Win Rate by Industry

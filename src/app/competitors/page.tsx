@@ -171,7 +171,7 @@ function CompetitorDetailCard({
         <span className="text-sm text-stone-400">{competitor.deals_faced} deals encountered</span>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div>
           <div className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-2.5">Head-to-Head Record</div>
           <div className="flex h-3 rounded-full overflow-hidden bg-stone-100">

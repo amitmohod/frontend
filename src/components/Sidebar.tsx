@@ -71,7 +71,7 @@ const navItems = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const [loadingPath, setLoadingPath] = useState<string | null>(null);
   const { dataSource, isSwitching, switchToMock, openHubSpotModal } = useDataSource();
@@ -85,6 +85,7 @@ export default function Sidebar() {
     if (pathname !== href) {
       setLoadingPath(href);
     }
+    onClose?.();
   };
 
   return (

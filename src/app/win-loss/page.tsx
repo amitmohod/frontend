@@ -50,7 +50,7 @@ export default function WinLossPage() {
       </div>
 
       {/* Dimension Tabs */}
-      <div className="flex gap-1 bg-stone-100 p-1 rounded-xl w-fit">
+      <div className="flex gap-1 bg-stone-100 p-1 rounded-xl overflow-x-auto">
         {DIMENSIONS.map((d) => (
           <button
             key={d.key}
@@ -67,7 +67,7 @@ export default function WinLossPage() {
       </div>
 
       {/* Breakdown Chart + Table */}
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
           <h3 className="text-sm font-semibold text-stone-700 mb-5">
             Win Rate by {DIMENSIONS.find((d) => d.key === dimension)?.label}

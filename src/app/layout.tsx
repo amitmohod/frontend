@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
 import PageLoadingOverlay from "@/components/PageLoadingOverlay";
 import Providers from "@/components/Providers";
+import AppShell from "@/components/AppShell";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,12 +33,7 @@ export default function RootLayout({
       >
         <Providers>
           <PageLoadingOverlay />
-          <div className="flex min-h-screen">
-            <Sidebar />
-            <main className="flex-1 overflow-auto">
-              <div className="max-w-7xl mx-auto px-8 py-8">{children}</div>
-            </main>
-          </div>
+          <AppShell>{children}</AppShell>
         </Providers>
       </body>
     </html>

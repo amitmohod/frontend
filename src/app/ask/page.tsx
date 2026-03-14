@@ -45,7 +45,7 @@ export default function AskAIPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex flex-col h-[calc(100vh-9rem)] lg:h-[calc(100vh-4rem)]">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-stone-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>
           Ask AI
@@ -66,7 +66,7 @@ export default function AskAIPage() {
             </div>
             <p className="text-stone-500 text-sm mb-1 font-medium">What would you like to know?</p>
             <p className="text-stone-400 text-xs mb-8">Ask me anything about your 175 CRM deals</p>
-            <div className="grid grid-cols-2 gap-2.5 max-w-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-w-lg w-full px-4 sm:px-0">
               {SUGGESTED_QUESTIONS.map((q) => (
                 <button
                   key={q}

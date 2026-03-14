@@ -37,7 +37,7 @@ export default function ObjectionsPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
           <h3 className="text-sm font-semibold text-stone-700 mb-5">Objection Frequency</h3>
           {objections ? (

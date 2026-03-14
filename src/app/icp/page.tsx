@@ -19,7 +19,7 @@ export default function ICPPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Data-Driven ICP */}
         <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center gap-2.5 mb-6">
