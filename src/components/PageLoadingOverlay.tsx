@@ -14,9 +14,7 @@ export default function PageLoadingOverlay() {
 
     // Small delay to avoid flash for instant navigations
     const showTimer = setTimeout(() => {
-      if (isLoading) {
-        setDisplayLoading(true);
-      }
+      setDisplayLoading(true);
     }, 100);
 
     // Clear loading when pathname changes (navigation complete)
