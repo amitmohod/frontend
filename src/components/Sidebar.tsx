@@ -4,6 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useDataSource } from "@/contexts/DataSourceContext";
+import { useProductLine, PRODUCT_LINE_LABELS, ProductLine } from "@/contexts/ProductLineContext";
+
+const PRODUCT_LINE_KEYS = Object.keys(PRODUCT_LINE_LABELS) as ProductLine[];
 
 const navItems = [
   {
@@ -69,12 +72,22 @@ const navItems = [
       </svg>
     ),
   },
+  {
+    label: "Product Intel",
+    href: "/product",
+    icon: (
+      <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
+      </svg>
+    ),
+  },
 ];
 
 export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const [loadingPath, setLoadingPath] = useState<string | null>(null);
   const { dataSource, isSwitching, switchToMock, openHubSpotModal } = useDataSource();
+  const { productLine, setProductLine } = useProductLine();
 
   // Clear loading state when pathname changes (navigation complete)
   useEffect(() => {
@@ -96,6 +109,29 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
         </h1>
         <p className="text-[11px] text-stone-400 mt-0.5 tracking-wide">SALES INTELLIGENCE</p>
       </div>
+
+      {/* Product line selector */}
+      <div className="px-3 py-3 border-b border-stone-100">
+        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest px-1 mb-2">
+          Product Line
+        </p>
+        <div className="flex gap-1 bg-stone-100 p-1 rounded-xl">
+          {PRODUCT_LINE_KEYS.map((pl) => (
+            <button
+              key={pl}
+              onClick={() => setProductLine(pl)}
+              className={`flex-1 py-1.5 rounded-lg text-[11px] font-semibold transition-all whitespace-nowrap ${
+                productLine === pl
+                  ? "bg-white text-stone-800 shadow-sm"
+                  : "text-stone-400 hover:text-stone-600"
+              }`}
+            >
+              {PRODUCT_LINE_LABELS[pl]}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
