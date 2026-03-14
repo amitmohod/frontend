@@ -8,6 +8,7 @@ import type {
   Deal,
   AIInsightResponse,
   StrategicSignals,
+  TrendPoint,
   DealTranscriptsResponse,
   Transcript,
   TranscriptListItem,
@@ -55,6 +56,10 @@ export function useDeals(params?: {
 
 export function useRecentDeals(limit = 10) {
   return useSWR<Deal[]>(`${API}/deals/recent?limit=${limit}`, fetcher);
+}
+
+export function useTrends() {
+  return useSWR<TrendPoint[]>(`${API}/analytics/trends`, fetcher);
 }
 
 export function useStrategicSignals() {

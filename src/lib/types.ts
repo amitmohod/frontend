@@ -108,6 +108,24 @@ export interface SegmentStat {
   total: number;
 }
 
+export interface KPIComparison {
+  period_label: string;
+  win_rate_change: number;
+  revenue_change_pct: number;
+  deal_count_change: number;
+  cycle_change: number;
+}
+
+export interface TrendPoint {
+  month: string;
+  year: number;
+  month_num: number;
+  win_rate: number;
+  deals: number;
+  won: number;
+  revenue: number;
+}
+
 export interface EnhancedKPIs {
   win_rate: number;
   won_deals: number;
@@ -126,6 +144,7 @@ export interface EnhancedKPIs {
   avg_cycle_won: number;
   avg_cycle_lost: number;
   cycle_drag: number;
+  comparison?: KPIComparison;
 }
 
 export interface GrowthLever {
